@@ -102,7 +102,7 @@ class Main(object):
         return status
 
     def wait_snapshot(self, snapshotId):
-        if self.parameters['waitTimeout'] is None:
+        if not self.parameters['waitTimeout']:
             counter = self.waitTimeout
         else:
             counter = self.parameters['waitTimeout']
