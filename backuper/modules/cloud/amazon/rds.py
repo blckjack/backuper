@@ -87,7 +87,7 @@ class Main(object):
         SourceDBSnapshotIdentifier = resource['DBSnapshot']['DBSnapshotArn']
         response = self.client.copy_db_snapshot(
             SourceDBSnapshotIdentifier=SourceDBSnapshotIdentifier,
-            TargetDBSnapshotIdentifier=self.client.parameters['snapshotId'],
+            TargetDBSnapshotIdentifier=self.parameters['snapshotId'],
             CopyTags=True,
             SourceRegion=self.parameters['region']
         )
@@ -102,15 +102,15 @@ class Main(object):
         return status
 
     def wait_snapshot(self, snapshotId):
-        if self.client.parameters['waitTimeout'] is None:
+        if self.parameters['waitTimeout'] is None:
             counter = waitTimeout
-        counter = self.client.parameters['waitTimeout']
+        counter = self.parameters['waitTimeout']
         print(get_msg(self.kwargs['type']) +
                 self.kwargs['action'] + ' is in progress...\n')
         while counter >= 0:
             status = self.client.snapshot_status(snapshotId)
             if status == 'available':
-                print(get_msg(self.client.parameters['type']) +
+                print(get_msg(self.parameters['type']) +
                       '{} snapshot is available in region...\n'.format(
                           snapshotId))
                 break
@@ -134,40 +134,40 @@ class Main(object):
     def run(self):
 
         if self.kwargs['action'] == 'create':
-            create_r = self.client.create_snapshot()
-            self.client.wait_snapshot(self.client.parameters['snapshotId'])
-            if self.client.parameters['copyToRegion'] is not None:
+            create_r = self.create_snapshot()
+            self.wait_snapshot(self.parameters['snapshotId'])
+            if self.parameters['copyToRegion'] is not None:
                 jobs = []
-                for region in self.client.parameters['copyToRegion']:
+                for region in self.parameters['copyToRegion']:
                     self.copy_snapshot(create_r)
                     p = Process(target=self.wait_snapshot,
-                                args=(self.client.parameters['snapshotId']))
+                                args=(self.parameters['snapshotId']))
                     jobs.append(p)
                     p.start()
 
         if self.kwargs['action'] == 'delete':
-            snapshots = self.client.get_snapshots()
+            snapshots = self.get_snapshots()
             validate_empty_snapshots(snapshots['DBSnapshots'])
-            if self.client.parameters['snapshotType'] != 'all':
-                snapshots_by_type=self.client.filter_snapshots_by_type(
-                    snapshots, self.client.parameters['snapshotType'])
+            if self.parameters['snapshotType'] != 'all':
+                snapshots_by_type=self.filter_snapshots_by_type(
+                    snapshots, self.parameters['snapshotType'])
             snapshots_by_type=[snapshot for snapshot in snapshots['DBSnapshots']]
             validate_empty_snapshots(snapshots_by_type,
-                                     get_msg(self.client.parameters['type']) +
+                                     get_msg(self.parameters['type']) +
                                      'There are no {} snapshots in region...\n'.format(
-                                         self.client.parameters['snapshotType']))
+                                         self.parameters['snapshotType']))
             adapted = self.adapted_snapshots(snapshots_by_type)
             snapshots_filtered = f_main(
-                self.client.parameters['filters'], adapted)
-            self.client.delete_snapshot(snapshots_filtered)
+                self.parameters['filters'], adapted)
+            self.delete_snapshot(snapshots_filtered)
 
         if self.kwargs['action'] == 'restore':
-            restore = self.client.restore_from_snapshot()
+            restore = self.restore_from_snapshot()
             print(get_msg(self.kwargs['type']) +
                   self.kwargs['action'] + ' is in progress...\n')
             i = 0
             while i != 'available':
-                i = self.client.instance_is_available()
+                i = self.instance_is_available()
                 sleep(60)
 
         print(get_msg(self.kwargs['type']) + self.kwargs['action'] +
