@@ -45,19 +45,19 @@ class Main(object):
             self.kwargs['type'], self.parameters['region'])
 
     def get_snapshots(self):
-        response = self.describe_db_snapshots()
+        response = self.client.describe_db_snapshots()
 
         return response
 
     def create_snapshot(self):
-        response = self.create_db_snapshot(
+        response = self.client.create_db_snapshot(
             DBSnapshotIdentifier=self.parameters['snapshotId'],
             DBInstanceIdentifier=self.parameters['databaseId']
         )
         return response
 
     def restore_from_snapshot(self):
-        response = self.restore_db_instance_from_db_snapshot(
+        response = self.client.restore_db_instance_from_db_snapshot(
             DBSnapshotIdentifier=self.parameters['snapshotId'],
             DBInstanceIdentifier=self.parameters['databaseId']
         )
@@ -65,7 +65,7 @@ class Main(object):
         return response
 
     def instance_is_available(self):
-        instance = self.describe_db_instances(
+        instance = self.client.describe_db_instances(
             DBInstanceIdentifier=self.parameters['databaseId'])
         status = instance['DBInstances'][0]['DBInstanceStatus']
 
@@ -74,7 +74,7 @@ class Main(object):
     def delete_snapshot(self, snapshots):
         r = []
         for snapshot in snapshots:
-            response = self.delete_db_snapshot(
+            response = self.client.delete_db_snapshot(
                 DBSnapshotIdentifier=snapshot['DBSnapshotIdentifier']
             )
             print(get_msg(self.kwargs['type']) +
@@ -85,7 +85,7 @@ class Main(object):
 
     def copy_snapshot(self, resource):
         SourceDBSnapshotIdentifier = resource['DBSnapshot']['DBSnapshotArn']
-        response = self.copy_db_snapshot(
+        response = self.client.copy_db_snapshot(
             SourceDBSnapshotIdentifier=SourceDBSnapshotIdentifier,
             TargetDBSnapshotIdentifier=self.parameters['snapshotId'],
             CopyTags=True,
@@ -110,7 +110,7 @@ class Main(object):
         print(get_msg(self.kwargs['type']) +
                 self.kwargs['action'] + ' is in progress...\n')
         while counter >= 0:
-            status = snapshot_status(snapshotId)
+            status = self.snapshot_status(snapshotId)
             if status == 'available':
                 print(get_msg(self.parameters['type']) +
                       '{} snapshot is available in region...\n'.format(
@@ -136,12 +136,12 @@ class Main(object):
     def run(self):
 
         if self.kwargs['action'] == 'create':
-            create_r = self.create_snapshot()
+            create = self.create_snapshot()
             self.wait_snapshot(self.parameters['snapshotId'])
             if self.parameters['copyToRegion'] is not None:
                 jobs = []
                 for region in self.parameters['copyToRegion']:
-                    self.copy_snapshot(create_r)
+                    self.copy_snapshot(create)
                     p = Process(target=self.wait_snapshot,
                                 args=(self.parameters['snapshotId']))
                     jobs.append(p)
