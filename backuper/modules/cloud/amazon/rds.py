@@ -83,9 +83,11 @@ class Main(object):
 
         return r
 
-    def copy_snapshot(self, resource):
+    def copy_snapshot(self, resource, region):
+        
         SourceDBSnapshotIdentifier = resource['DBSnapshot']['DBSnapshotArn']
-        response = self.client.copy_db_snapshot(
+        c = get_amazon_client(self.kwargs['type'], region)
+        response = c.client.copy_db_snapshot(
             SourceDBSnapshotIdentifier=SourceDBSnapshotIdentifier,
             TargetDBSnapshotIdentifier=self.parameters['snapshotId'],
             CopyTags=True,
@@ -141,7 +143,7 @@ class Main(object):
             if self.parameters.get('copyToRegion') is not None:
                 jobs = []
                 for region in self.parameters.get('copyToRegion'):
-                    self.copy_snapshot(create)
+                    self.copy_snapshot(create, region)
                     p = Process(target=self.wait_snapshot,
                                 args=(self.parameters['snapshotId']))
                     jobs.append(p)
