@@ -110,7 +110,7 @@ class Main(object):
         print(get_msg(self.kwargs['type']) +
                 self.kwargs['action'] + ' is in progress...\n')
         while counter >= 0:
-            status = self.snapshot_status(snapshotId)
+            status = snapshot_status(snapshotId)
             if status == 'available':
                 print(get_msg(self.parameters['type']) +
                       '{} snapshot is available in region...\n'.format(
