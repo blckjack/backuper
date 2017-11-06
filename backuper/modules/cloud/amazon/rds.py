@@ -138,9 +138,9 @@ class Main(object):
         if self.kwargs['action'] == 'create':
             create = self.create_snapshot()
             self.wait_snapshot(self.parameters['snapshotId'])
-            if self.parameters['copyToRegion'] is not None:
+            if self.parameters.get('copyToRegion') is not None:
                 jobs = []
-                for region in self.parameters['copyToRegion']:
+                for region in self.parameters.get('copyToRegion'):
                     self.copy_snapshot(create)
                     p = Process(target=self.wait_snapshot,
                                 args=(self.parameters['snapshotId']))
