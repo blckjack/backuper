@@ -86,8 +86,8 @@ class Main(object):
     def copy_snapshot(self, resource, region):
         # Changing region(source->dest), to be able to copy snapshot from SourceRegion to DestinationRegion
         SourceDBSnapshotIdentifier = resource['DBSnapshot']['DBSnapshotArn']
-        c = self.get_amazon_client(self.kwargs['type'], region)
-        response = c.copy_db_snapshot(
+        self.client = get_amazon_client(self.kwargs['type'], region)
+        response = self.client.copy_db_snapshot(
             SourceDBSnapshotIdentifier=SourceDBSnapshotIdentifier,
             TargetDBSnapshotIdentifier=self.parameters['snapshotId'],
             CopyTags=True,
