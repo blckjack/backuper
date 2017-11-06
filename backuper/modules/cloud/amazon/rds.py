@@ -104,7 +104,8 @@ class Main(object):
     def wait_snapshot(self, snapshotId):
         if self.parameters['waitTimeout'] is None:
             counter = waitTimeout
-        counter = self.parameters['waitTimeout']
+        else:
+            counter = self.parameters['waitTimeout']
         print(get_msg(self.kwargs['type']) +
                 self.kwargs['action'] + ' is in progress...\n')
         while counter >= 0:
