@@ -87,7 +87,7 @@ class Main(object):
         
         SourceDBSnapshotIdentifier = resource['DBSnapshot']['DBSnapshotArn']
         c = get_amazon_client(self.kwargs['type'], region)
-        response = c.client.copy_db_snapshot(
+        response = c.copy_db_snapshot(
             SourceDBSnapshotIdentifier=SourceDBSnapshotIdentifier,
             TargetDBSnapshotIdentifier=self.parameters['snapshotId'],
             CopyTags=True,
