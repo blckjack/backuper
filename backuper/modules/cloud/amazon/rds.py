@@ -112,7 +112,7 @@ class Main(object):
         while counter >= 0:
             status = self.snapshot_status(snapshotId)
             if status == 'available':
-                print(get_msg(self.parameters['type']) +
+                print(get_msg(self.kwargs['type']) +
                       '{} snapshot is available in region...\n'.format(
                           snapshotId))
                 break
