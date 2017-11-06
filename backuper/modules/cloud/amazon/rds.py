@@ -147,7 +147,7 @@ class Main(object):
 
         if self.kwargs['action'] == 'delete':
             snapshots = self.client.get_snapshots()
-            validate_empty_snapshots(snapshots['DBSnapshots']))
+            validate_empty_snapshots(snapshots['DBSnapshots'])
             if self.client.parameters['snapshotType'] != 'all':
                 snapshots_by_type=self.client.filter_snapshots_by_type(
                     snapshots, self.client.parameters['snapshotType'])
