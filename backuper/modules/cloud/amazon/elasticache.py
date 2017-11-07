@@ -47,7 +47,7 @@ class Main(object):
         response = self.client.create_snapshot(
             Engine=self.parameters['engine'],
             SnapshotName=self.parameters['snapshotId'],
-            CacheClusterId=self.parameters['databaseId']
+            ReplicationGroupId=self.parameters['databaseId']
         )
         return response
 
