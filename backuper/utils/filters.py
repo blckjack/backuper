@@ -51,8 +51,9 @@ def main(filters, snapshots):
 
     snapshots = snapshots
 
-    for i in filters:
-        f = getattr(BackuperFilter(), 'filter_matcher')(i['type'])
-        snapshots = f(i, snapshots)
+    if filters not None:
+        for i in filters:
+            f = getattr(BackuperFilter(), 'filter_matcher')(i['type'])
+            snapshots = f(i, snapshots)
 
     return snapshots
