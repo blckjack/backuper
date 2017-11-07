@@ -163,7 +163,7 @@ class Main(object):
                 ' There are no {} snapshots in region...\n'.format(self.parameters['snapshotType']))
             adapted = self.adapted_snapshots(snapshots_by_type)
             snapshots_filtered = f_main(
-                self.parameters['filters'], adapted)
+                self.parameters.get('filters'), adapted)
             self.delete_snapshot(snapshots_filtered)
 
         if self.kwargs['action'] == 'restore':
