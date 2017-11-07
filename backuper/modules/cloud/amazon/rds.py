@@ -158,10 +158,9 @@ class Main(object):
                 snapshots_by_type=self.filter_snapshots_by_type(
                     snapshots, self.parameters['snapshotType'])
             snapshots_by_type=[snapshot for snapshot in snapshots['DBSnapshots']]
-            validate_empty_snapshots(snapshots_by_type,
-                                     get_msg(self.kwargs['type']) +
-                                     'There are no {} snapshots in region...\n'.format(
-                                         self.parameters['snapshotType']))
+            validate_empty_snapshots(snapshots_by_type)
+            print(get_msg(self.kwargs['type']) + 
+                ' There are no {} snapshots in region...\n'.format(self.parameters['snapshotType']))
             adapted = self.adapted_snapshots(snapshots_by_type)
             snapshots_filtered = f_main(
                 self.parameters['filters'], adapted)
