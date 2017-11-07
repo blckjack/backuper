@@ -96,14 +96,15 @@ class Main(object):
 
         return response
 
-    def snapshot_status(self, DBSnapshotIdentifier):
+    def snapshot_status(self, DBSnapshotIdentifier, region):
+        self.client = get_amazon_client(self.kwargs['type'], region)
         snapshots = self.get_snapshots()
         for snapshot in snapshots['DBSnapshots']:
             if snapshot['DBSnapshotIdentifier'] == DBSnapshotIdentifier:
                 status = snapshot['Status']
         return status
 
-    def wait_snapshot(self, snapshotId):
+    def wait_snapshot(self, snapshotId, region):
         if self.parameters.get('waitTimeout') is None:
             counter = waitTimeout
         else:
@@ -112,7 +113,7 @@ class Main(object):
         print(get_msg(self.kwargs['type']) +
                 self.kwargs['action'] + ' is in progress...\n')
         while counter >= 0:
-            status = self.snapshot_status(snapshotId)
+            status = self.snapshot_status(snapshotId, region)
             if status == 'available':
                 print(get_msg(self.kwargs['type']) +
                       '{} snapshot is available in region...\n'.format(
@@ -145,7 +146,7 @@ class Main(object):
                 for region in self.parameters.get('copyToRegion'):
                     self.copy_snapshot(resource, region)
                     p = Process(target=self.wait_snapshot,
-                                args=(self.parameters['snapshotId']))
+                                args=(self.parameters['snapshotId'], region))
                     jobs.append(p)
                     p.start()
 
