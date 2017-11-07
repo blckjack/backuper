@@ -46,7 +46,7 @@ class Main(object):
     def create_snapshot(self):
         response = self.client.create_snapshot(
             SnapshotName=self.parameters['snapshotId'],
-            CacheClusterId=self.parameters['databaseId'] + "-001"
+            CacheClusterId=self.parameters['databaseId']
         )
         return response
 
