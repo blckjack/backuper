@@ -124,10 +124,10 @@ class Main(object):
                 sleep(30)
                 counter -= 30
 
-    def filter_snapshots_by_type(self, snapshots, type):
+    def filter_snapshots_by_type(self, snapshots, SnapshotType):
         filtered = []
         for snapshot in snapshots['DBSnapshots']:
-            if snapshot['SnapshotType'] == type:
+            if snapshot['SnapshotType'] == SnapshotType:
                 filtered.append(snapshot)
         return filtered
 
@@ -159,7 +159,7 @@ class Main(object):
                     snapshots, self.parameters['snapshotType'])
             snapshots_by_type=[snapshot for snapshot in snapshots['DBSnapshots']]
             validate_empty_snapshots(snapshots_by_type,
-                                     get_msg(self.parameters['type']) +
+                                     get_msg(self.kwargs['type']) +
                                      'There are no {} snapshots in region...\n'.format(
                                          self.parameters['snapshotType']))
             adapted = self.adapted_snapshots(snapshots_by_type)
