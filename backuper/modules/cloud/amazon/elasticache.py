@@ -12,6 +12,7 @@ class ValidateElasticache(ValidateBase):
         if kwargs['action'] == 'create':
             parameters_schema = self.tr.Dict({
                 self.tr.Key('region'): self.tr.Enum(*amazonRegions),
+                self.tr.Key('engine'): self.tr.String,
                 self.tr.Key('snapshotId'): self.tr.String,
                 self.tr.Key('databaseId'): self.tr.String
             })
@@ -19,6 +20,7 @@ class ValidateElasticache(ValidateBase):
         if kwargs['action'] == 'restore':
             parameters_schema = self.tr.Dict({
                 self.tr.Key('region'): self.tr.Enum(*amazonRegions),
+                self.tr.Key('engine'): self.tr.String,
                 self.tr.Key('snapshotId'): self.tr.String,
                 self.tr.Key('databaseId'): self.tr.String
             })
@@ -26,6 +28,7 @@ class ValidateElasticache(ValidateBase):
         if kwargs['action'] == 'delete':
             parameters_schema = self.tr.Dict({
                 self.tr.Key('region'): self.tr.Enum(*amazonRegions),
+                self.tr.Key('engine'): self.tr.String,
                 self.tr.Key('snapshotId'): self.tr.String
             })
         parameters_schema(kwargs['parameters'])
@@ -42,6 +45,7 @@ class Main(object):
 
     def create_snapshot(self):
         response = self.client.create_snapshot(
+            Engine=self.parameters['engine'],
             SnapshotName=self.parameters['snapshotId'],
             CacheClusterId=self.parameters['databaseId']
         )
@@ -49,6 +53,7 @@ class Main(object):
 
     def restore_from_snapshot(self):
         response = self.client.create_cache_cluster(
+            Engine=self.parameters['engine'],
             SnapshotName=self.parameters['snapshotId'],
             CacheClusterId=self.parameters['databaseId']
         )
@@ -56,18 +61,21 @@ class Main(object):
 
     def delete_snapshot(self):
         response = self.client.delete_snapshot(
+            Engine=self.parameters['engine'],
             SnapshotName=self.parameters['snapshotId']
         )
         return response
 
     def snapshot_is_available(self):
         response = self.client.describe_snapshots(
+            Engine=self.parameters['engine'],
             SnapshotName=self.parameters['snapshotId'])
         response_status = response['Snapshots'][0]['SnapshotStatus']
         return response_status
 
     def cache_cluster_is_available(self):
         response = self.client.describe_cache_clusters(
+            Engine=self.parameters['engine'],
             CacheClusterId=self.parameters['databaseId'])
         response_status = response['CacheClusters'][0]['CacheClusterStatus']
         return response_status

@@ -14,6 +14,7 @@ class ValidateRDS(ValidateBase):
         if kwargs['action'] == 'create':
             parameters_schema = self.tr.Dict({
                 self.tr.Key('region'): self.tr.Enum(*amazonRegions),
+                self.tr.Key('engine'): self.tr.String,
                 self.tr.Key('snapshotId'): self.tr.String,
                 self.tr.Key('databaseId'): self.tr.String
             })
@@ -21,6 +22,7 @@ class ValidateRDS(ValidateBase):
         if kwargs['action'] == 'restore':
             parameters_schema = self.tr.Dict({
                 self.tr.Key('region'): self.tr.Enum(*amazonRegions),
+                self.tr.Key('engine'): self.tr.String,
                 self.tr.Key('snapshotId'): self.tr.String,
                 self.tr.Key('databaseId'): self.tr.String
             })
@@ -28,6 +30,7 @@ class ValidateRDS(ValidateBase):
         if kwargs['action'] == 'delete':
             parameters_schema = self.tr.Dict({
                 self.tr.Key('region'): self.tr.Enum(*amazonRegions),
+                self.tr.Key('engine'): self.tr.String,
                 self.tr.Key('snapshotId'): self.tr.String,
                 self.tr.Key('snapshotType'): self.tr.Enum(
                     *['standard', 'manual', 'all'])
@@ -45,12 +48,13 @@ class Main(object):
             self.kwargs['type'], self.parameters['region'])
 
     def get_snapshots(self):
-        response = self.client.describe_db_snapshots()
+        response = self.client.describe_db_snapshots(Engine=self.parameters['engine'])
 
         return response
 
     def create_snapshot(self):
         response = self.client.create_db_snapshot(
+            Engine=self.parameters['engine'],
             DBSnapshotIdentifier=self.parameters['snapshotId'],
             DBInstanceIdentifier=self.parameters['databaseId']
         )
@@ -58,6 +62,7 @@ class Main(object):
 
     def restore_from_snapshot(self):
         response = self.client.restore_db_instance_from_db_snapshot(
+            Engine=self.parameters['engine'],
             DBSnapshotIdentifier=self.parameters['snapshotId'],
             DBInstanceIdentifier=self.parameters['databaseId']
         )
@@ -66,6 +71,7 @@ class Main(object):
 
     def instance_is_available(self):
         instance = self.client.describe_db_instances(
+            Engine=self.parameters['engine'],
             DBInstanceIdentifier=self.parameters['databaseId'])
         status = instance['DBInstances'][0]['DBInstanceStatus']
 
@@ -75,6 +81,7 @@ class Main(object):
         r = []
         for snapshot in snapshots:
             response = self.client.delete_db_snapshot(
+                Engine=self.parameters['engine'],
                 DBSnapshotIdentifier=snapshot['DBSnapshotIdentifier']
             )
             print(get_msg(self.kwargs['type']) +
@@ -88,6 +95,7 @@ class Main(object):
         # Changing region(source->dest), to be able to copy snapshot from SourceRegion to DestinationRegion
         self.client = get_amazon_client(self.kwargs['type'], region)
         response = self.client.copy_db_snapshot(
+            Engine=self.parameters['engine'],
             SourceDBSnapshotIdentifier=SourceDBSnapshotIdentifier,
             TargetDBSnapshotIdentifier=self.parameters['snapshotId'],
             CopyTags=True,
