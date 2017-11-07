@@ -84,8 +84,8 @@ class Main(object):
         return r
 
     def copy_snapshot(self, resource, region):
-        # Changing region(source->dest), to be able to copy snapshot from SourceRegion to DestinationRegion
         SourceDBSnapshotIdentifier = resource['DBSnapshot']['DBSnapshotArn']
+        # Changing region(source->dest), to be able to copy snapshot from SourceRegion to DestinationRegion
         self.client = get_amazon_client(self.kwargs['type'], region)
         response = self.client.copy_db_snapshot(
             SourceDBSnapshotIdentifier=SourceDBSnapshotIdentifier,
@@ -97,6 +97,7 @@ class Main(object):
         return response
 
     def snapshot_status(self, DBSnapshotIdentifier, region):
+        # Changing region(source->dest), to be able to copy snapshot from SourceRegion to DestinationRegion
         self.client = get_amazon_client(self.kwargs['type'], region)
         snapshots = self.get_snapshots()
         for snapshot in snapshots['DBSnapshots']:
@@ -140,7 +141,7 @@ class Main(object):
 
         if self.kwargs['action'] == 'create':
             resource = self.create_snapshot()
-            self.wait_snapshot(self.parameters['snapshotId'])
+            self.wait_snapshot(self.parameters['snapshotId'], self.parameters['region'])
             if self.parameters.get('copyToRegion') is not None:
                 jobs = []
                 for region in self.parameters.get('copyToRegion'):
