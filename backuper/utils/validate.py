@@ -48,7 +48,8 @@ class ValidateBase(object):
             checks[filter['type']](filter)
 
 
-def validate_empty_snapshots(snapshots, msg):
+def validate_empty_snapshots(snapshots):
 
     if not snapshots:
-        raise BackuperNoSnapshotMatchError(msg)
+        # raise BackuperNoSnapshotMatchError(msg)
+        print("No snapshots were found.")
