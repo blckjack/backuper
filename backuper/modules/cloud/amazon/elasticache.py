@@ -12,7 +12,6 @@ class ValidateElasticache(ValidateBase):
         if kwargs['action'] == 'create':
             parameters_schema = self.tr.Dict({
                 self.tr.Key('region'): self.tr.Enum(*amazonRegions),
-                self.tr.Key('engine'): self.tr.String,
                 self.tr.Key('snapshotId'): self.tr.String,
                 self.tr.Key('databaseId'): self.tr.String
             })
@@ -20,7 +19,6 @@ class ValidateElasticache(ValidateBase):
         if kwargs['action'] == 'restore':
             parameters_schema = self.tr.Dict({
                 self.tr.Key('region'): self.tr.Enum(*amazonRegions),
-                self.tr.Key('engine'): self.tr.String,
                 self.tr.Key('snapshotId'): self.tr.String,
                 self.tr.Key('databaseId'): self.tr.String
             })
@@ -28,7 +26,6 @@ class ValidateElasticache(ValidateBase):
         if kwargs['action'] == 'delete':
             parameters_schema = self.tr.Dict({
                 self.tr.Key('region'): self.tr.Enum(*amazonRegions),
-                self.tr.Key('engine'): self.tr.String,
                 self.tr.Key('snapshotId'): self.tr.String
             })
         parameters_schema(kwargs['parameters'])
